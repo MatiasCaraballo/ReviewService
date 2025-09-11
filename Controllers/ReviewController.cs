@@ -4,6 +4,7 @@ using Reviews.DTOs;
 
 [ApiController]
 [Route("[controller]")]
+
 public class ReviewController : ControllerBase
 {
     private readonly IReviewService _reviewService;
@@ -16,6 +17,7 @@ public class ReviewController : ControllerBase
     [HttpPost()]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Admin,Client")]
 
     public async Task<ActionResult<ReviewCreateDto>> PostReview(ReviewCreateDto reviewCreateDto)
     {

@@ -37,7 +37,8 @@ public class ReviewsDbContext : DbContext
                   .HasMaxLength(500);
 
             entity.Property(r => r.Rating)
-                  .IsRequired();
+                  .HasColumnType("int")
+                  .IsRequired(true);
 
             entity.Property(r => r.CreatedAt)
                   .IsRequired()
