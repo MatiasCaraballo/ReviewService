@@ -10,9 +10,9 @@ public interface IReviewService
 
     Task<ReviewReadDto> GetReviewById(int reviewId);
 
+    Task<IEnumerable<ReviewReadRankingDto>> GetMostReviewedMovies(ReviewsListDto reviewsListDto);
 
-    
-    
+
 
 
 }

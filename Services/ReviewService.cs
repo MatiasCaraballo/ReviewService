@@ -68,11 +68,12 @@ public class ReviewService : IReviewService
                 Rating = r.Rating
 
             }
+
         ).ToListAsync();
 
         return result;
     }
-    
+
     public async Task<ReviewReadDto> GetReviewById(int reviewId)
     {
         var review = await _context.Reviews.FindAsync(reviewId);
@@ -84,7 +85,28 @@ public class ReviewService : IReviewService
             Text = review.Text,
             Rating = review.Rating
         };
+
+        return result;
+    }
+    
+    public async Task<IEnumerable<ReviewReadRankingDto>> GetMostReviewedMovies(ReviewsListDto reviewsListDto)
+    {
+        var query = _context.Movies.AsQueryable();
+
+        var result = await query
+            .Skip((reviewReadDto.page - 1) * reviewListDto.perPage)
+            .Take(reviewListDto.perPage)
+            .GroupBy(r => r.MovieId)
+            .AsNoTracking()
+            .Select(g => new ReviewReadRankingDto
+                {
+                    MovieId = g.Key,
+                    ReviewsCount = g.Count()
+                }
+            )
+            .ToListAsync();
+
+        return result;
         
-        return result;    
     }
 }
