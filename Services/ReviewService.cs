@@ -88,25 +88,25 @@ public class ReviewService : IReviewService
 
         return result;
     }
-    
-    public async Task<IEnumerable<ReviewReadRankingDto>> GetMostReviewedMovies(ReviewsListDto reviewsListDto)
+
+    public async Task<IEnumerable<ReviewReadRankingDto>> GetMostReviewedMovies(int page, int perPage)
     {
-        var query = _context.Movies.AsQueryable();
+        if (page <= 0) { page = 1; };
 
-        var result = await query
-            .Skip((reviewReadDto.page - 1) * reviewListDto.perPage)
-            .Take(reviewListDto.perPage)
-            .GroupBy(r => r.MovieId)
-            .AsNoTracking()
+        if (perPage <=0) { perPage = 10; };
+
+        var query = _context.Reviews
+            .GroupBy(r => r.MovieId)                          
             .Select(g => new ReviewReadRankingDto
-                {
-                    MovieId = g.Key,
-                    ReviewsCount = g.Count()
-                }
-            )
-            .ToListAsync();
+            {
+                MovieId = g.Key,                               
+                ReviewsCount = g.Count()                       
+            })
+            .OrderByDescending(x => x.ReviewsCount)           
+            .Skip((page - 1) * perPage)                       
+            .Take(perPage);                                   
 
-        return result;
-        
-    }
+        return await query.ToListAsync();
+   }
+
 }

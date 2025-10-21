@@ -92,5 +92,23 @@ public class ReviewController : ControllerBase
         }
     }
 
+    [HttpGet("most-reviewed-movies-page/{page}-perpage/{perPage}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Admin,Client")]
+
+    public async Task<ActionResult<IEnumerable<ReviewReadDto>>> GetMostReviewedMovies(int page,int perPage)
+    {
+        try
+        {
+            var reviews = await _reviewService.GetMostReviewedMovies(page,perPage);
+            return Ok(reviews);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Internal Server error");
+        }
+    }
+
 
 }

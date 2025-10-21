@@ -93,10 +93,6 @@ builder.Services.AddOpenApiDocument(config =>
 
 var app = builder.Build();
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -113,6 +109,10 @@ if (app.Environment.IsDevelopment())
     }
     );
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.UseHttpsRedirection();
 app.MapControllers();
