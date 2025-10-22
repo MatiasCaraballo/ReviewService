@@ -1,6 +1,6 @@
 namespace Reviews.DTOs;
 using System.ComponentModel.DataAnnotations;
-
+using Newtonsoft.Json;
 
 public class ReviewCreateDto
 {
@@ -48,3 +48,18 @@ public class ReviewReadRankingDto
     [Required]
     public int ReviewsCount { get; set; }
 }
+public class ReviewRankingRatingDto
+{
+    [Required]
+    public int MovieId { get; set; }
+
+    [Required]
+    public double Rating { get; set; }
+    
+}
+public class ReviewUpdateDto
+{
+    public string? Text { get; set; } = string.Empty;
+    public int? Rating { get; set; }
+}
+

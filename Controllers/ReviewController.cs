@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Reviews.DTOs;
+using System.Security.Claims;
 
 [ApiController]
 [Route("[controller]")]
@@ -24,7 +25,8 @@ public class ReviewController : ControllerBase
 
         try
         {
-            var userId = this.User.Claims.ToList()[1].Value;
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
 
             var review = await _reviewService.PostReview(reviewCreateDto, userId);
 
@@ -97,11 +99,11 @@ public class ReviewController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Admin,Client")]
 
-    public async Task<ActionResult<IEnumerable<ReviewReadDto>>> GetMostReviewedMovies(int page,int perPage)
+    public async Task<ActionResult<IEnumerable<ReviewReadDto>>> GetMostReviewedMovies(int page, int perPage)
     {
         try
         {
-            var reviews = await _reviewService.GetMostReviewedMovies(page,perPage);
+            var reviews = await _reviewService.GetMostReviewedMovies(page, perPage);
             return Ok(reviews);
         }
         catch (Exception)
@@ -109,6 +111,82 @@ public class ReviewController : ControllerBase
             return StatusCode(500, "Internal Server error");
         }
     }
+
+    [HttpGet("/best-reviewed-movies/{page}-perpage/{perPage}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ReviewRankingRatingDto>> GetBestReviewedMovies(int page, int perPage)
+    {
+        try
+        {
+            var reviews = await _reviewService.GetBestReviewedMovies(page, perPage);
+            return Ok(reviews);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Internal Server error");
+        }
+    }
+    
+    [HttpGet("/worst-reviewed-movies/{page}-perpage/{perPage}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ReviewRankingRatingDto>> GetWorstReviewedMovies(int page, int perPage)
+    {
+        try
+        {
+            var reviews = await _reviewService.GetWorstReviewedMovies(page, perPage);
+            return Ok(reviews); 
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Internal Server error");
+        }
+    }
+
+    [HttpPatch()]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin,Client")]
+
+    public async Task<ActionResult> UpdateReview(int reviewId, ReviewUpdateDto reviewUpdateDto)
+    {
+        try
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var review = await _reviewService.UpdateReview(reviewId, userId, reviewUpdateDto);
+            return Ok(review);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Internal Server error");
+        }
+
+    }
+
+    [HttpDelete()]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin,Client")]
+
+    public async Task<ActionResult> DeleteReview(int reviewId)
+    {
+        try
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            string userRole = User.FindFirst(ClaimTypes.Role).Value;
+
+            var review = await _reviewService.DeleteReview(reviewId,userId,userRole);
+            return Ok(review);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Internal Server error");
+        }
+    }
+
 
 
 }
